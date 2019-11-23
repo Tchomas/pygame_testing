@@ -187,6 +187,9 @@ def redrawGameWindow():
         if hitMark.time < pygame.time.get_ticks() - 800:
             hitMarks.pop(hitMarks.index(hitMark))
 
+    fps = font1.render('FPS: ' + str(round(clock.get_fps())), 1, (0, 0, 0))
+    window.blit(fps, (10, 10))
+
     pygame.display.update()
 
 #main
