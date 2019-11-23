@@ -16,6 +16,14 @@ walkLeft = [pygame.image.load('pics/L1.png'), pygame.image.load('pics/L2.png'), 
             pygame.image.load('pics/L4.png'), pygame.image.load('pics/L5.png'), pygame.image.load('pics/L6.png'),
             pygame.image.load('pics/L7.png'), pygame.image.load('pics/L8.png'), pygame.image.load('pics/L9.png')]
 
+bulletSound = pygame.mixer.Sound('sounds/bullet.wav')
+hitSound = pygame.mixer.Sound('sounds/hit.wav')
+bulletSound.set_volume(0.2)
+hitSound.set_volume(0.2)
+music = pygame.mixer.music.load('sounds/music.mp3')
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.05)
+
 score = 0
 
 
@@ -100,28 +108,45 @@ class player(object):
         self.standing = True
         self.hitbox = (self.x + 20, self.y, 29, 60)
 
-    def draw(self, window):
+    def draw(self, win):
         if self.walkCount + 1 >= 27:
             self.walkCount = 0
 
-        if not(self.standing):
+        if not self.standing:
             if self.left:
-                window.blit(walkLeft[self.walkCount // 3], (self.x, self.y))
+                win.blit(walkLeft[self.walkCount // 3], (self.x, self.y))
                 self.walkCount += 1
             elif self.right:
-                window.blit(walkRight[self.walkCount // 3], (self.x, self.y))
+                win.blit(walkRight[self.walkCount // 3], (self.x, self.y))
                 self.walkCount += 1
         else:
             if self.right:
-                window.blit(walkRight[0], (self.x, self.y))
+                win.blit(walkRight[0], (self.x, self.y))
             else:
-                window.blit(walkLeft[0], (self.x, self.y))
+                win.blit(walkLeft[0], (self.x, self.y))
         self.hitbox = (self.x + 17, self.y + 13, 29, 50)
         # pygame.draw.rect(window, (255,0,0), self.hitbox, 1)
 
+    def hit(self):
+        self.x = 90
+        self.y = 350
+        self.walkCount = 0
+        font3 = pygame.font.SysFont('comicsans', 100)
+        text = font3.render('-5p', 1, (255, 0, 0))
+        window.blit(text, (screenWidth/2 - text.get_width()/2, screenHeight/2))
+        pygame.display.update()
+        i = 0
+        while i < 300:
+            pygame.time.delay(10)
+            i += 1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    i = 301
+                    pygame.quit()
+
 
 class marker(object):
-    def __init__(self,x,y,text):
+    def __init__(self, x, y, text):
         self.x = x
         self.y = y
         self.font = pygame.font.SysFont('comicsans', 24)
@@ -189,15 +214,21 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-    for  bullet in bullets:
-        if bullet.y -  bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
-            if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x -bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
+    if player1.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > goblin.hitbox[1]:
+        if player1.hitbox[0] + player1.hitbox[2] > goblin.hitbox[0] and player1.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
+            player1.hit()
+            score -= 5
+
+    for bullet in bullets:
+        if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
+            if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
                 goblin.hit(bullet.dmg)
+                hitSound.play()
                 hitMarks.append(marker(bullet.x, bullet.y, str(bullet.dmg)))
                 score += 1
                 bullets.pop(bullets.index(bullet))
 
-        if bullet.x < screenWidth and bullet.x > 0:
+        if screenWidth > bullet.x > 0:
             bullet.x += bullet.vel
         else:
             bullets.pop(bullets.index(bullet))
@@ -211,6 +242,7 @@ while run:
             facing = 1
         if len(bullets) < 5:
             bullets.append(projectile(round(player1.x + player1.width//2), round(player1.y + player1.height//2), 6, (0,0,0), facing, random.randint(0,2)))
+            bulletSound.play()
 
         shootLoop = 1
 
