@@ -71,14 +71,14 @@ class enemy(object):
             # pygame.draw.rect(win, (255, 0, 0), self.hitbox, 1)
 
     def move(self):
-        if self.vel > 0:
-            if self.x + self.vel < self.path[1]:
+        if self.vel < 0:
+            if self.x + self.vel > self.path[1]:
                 self.x += self.vel
             else:
                 self.vel = self.vel * -1
                 self.walkCount = 0
         else:
-            if self.x - self.vel > self.path[0]:
+            if self.x - self.vel < self.path[0]:
                 self.x += self.vel
             else:
                 self.vel = self.vel * -1
@@ -89,6 +89,7 @@ class enemy(object):
             self.health -= dmg
         else:
             self.visible = False
+
         self.hitCount += 1
         print("hit ", self.name, self.hitCount)
 
@@ -179,7 +180,9 @@ def redrawGameWindow():
     text = font1.render('Score: ' + str(score), 1, (0, 0, 0))
     window.blit(text, (390, 10))
     player1.draw(window)
-    goblin.draw(window)
+
+    for enem in enemies:
+        enem.draw(window)
 
     for bullet in bullets:
         bullet.draw(window)
@@ -194,20 +197,25 @@ def redrawGameWindow():
 
     pygame.display.update()
 
-#main
+# main
 player1 = player(90, 350, 64, 64)
-goblin = enemy(200, 350, 64, 64, 400, "goblin")
+goblin = enemy(550, 350, 64, 64, 150, "goblin")
+enemies = [goblin]
 bullets = []
 hitMarks = []
 shootLoop = 0
 font1 = pygame.font.SysFont('comicsans', 30, bold=True)
 font2 = pygame.font.SysFont('comicsans', 14)
-#mainloop
+i = 0
+# mainloop
 run = True
 while run:
-    # 27 FPS
-    #pygame.time.delay(37)
+    # max 27 FPS
     clock.tick(27)
+
+    if random.randint(0, 100) == 100:
+        enemies.append(enemy(550, 350, 64, 64, 150, "goblin" + str(i)))
+        i += 1
 
     # shoot cooldown
     if shootLoop > 0:
@@ -219,11 +227,10 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-    if goblin.visible == True:
-        if player1.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > goblin.hitbox[1]:
-            if player1.hitbox[0] + player1.hitbox[2] > goblin.hitbox[0] and player1.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
-                player1.hit()
-                score -= 5
+    if player1.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > goblin.hitbox[1]:
+        if player1.hitbox[0] + player1.hitbox[2] > goblin.hitbox[0] and player1.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
+            player1.hit()
+            score -= 5
 
     for bullet in bullets:
         if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
@@ -233,6 +240,8 @@ while run:
                 hitMarks.append(marker(bullet.x, bullet.y, str(bullet.dmg)))
                 score += 1
                 bullets.pop(bullets.index(bullet))
+                if goblin.visible == False:
+                    enemies.pop(enemies.index(goblin))              
 
         if screenWidth > bullet.x > 0:
             bullet.x += bullet.vel
