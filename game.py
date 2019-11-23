@@ -128,6 +128,8 @@ class player(object):
         # pygame.draw.rect(window, (255,0,0), self.hitbox, 1)
 
     def hit(self):
+        self.isJump = False
+        self.jumpCount = 10
         self.x = 90
         self.y = 350
         self.walkCount = 0
@@ -217,10 +219,11 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-    if player1.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > goblin.hitbox[1]:
-        if player1.hitbox[0] + player1.hitbox[2] > goblin.hitbox[0] and player1.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
-            player1.hit()
-            score -= 5
+    if goblin.visible == True:
+        if player1.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > goblin.hitbox[1]:
+            if player1.hitbox[0] + player1.hitbox[2] > goblin.hitbox[0] and player1.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
+                player1.hit()
+                score -= 5
 
     for bullet in bullets:
         if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
