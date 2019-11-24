@@ -3,7 +3,7 @@ import random
 
 pygame.init()
 clock = pygame.time.Clock()
-screenWidth = 600
+screenWidth = 800
 screenHeight = 450
 window = pygame.display.set_mode(size=(screenWidth, screenHeight))
 pygame.display.set_caption("My Game")
@@ -178,7 +178,7 @@ class projectile(object):
 def redrawGameWindow():
     window.blit(bg, (0,0))
     text = font1.render('Score: ' + str(score), 1, (0, 0, 0))
-    window.blit(text, (390, 10))
+    window.blit(text, (screenWidth - 200, 10))
     player1.draw(window)
 
     for enem in enemies:
@@ -214,7 +214,7 @@ while run:
     clock.tick(27)
 
     if random.randint(0, 100) == 100:
-        enemies.append(enemy(550, 350, 64, 64, 150, "goblin" + str(i)))
+        enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "goblin" + str(i)))
         i += 1
 
     # shoot cooldown
@@ -233,23 +233,26 @@ while run:
             score -= 5
 
     for bullet in bullets:
-        if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
-            if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
-                goblin.hit(bullet.dmg)
-                hitSound.play()
-                hitMarks.append(marker(bullet.x, bullet.y, str(bullet.dmg)))
-                score += 1
-                bullets.pop(bullets.index(bullet))
-                if goblin.visible == False:
-                    enemies.pop(enemies.index(goblin))              
-
         if screenWidth > bullet.x > 0:
             bullet.x += bullet.vel
         else:
             bullets.pop(bullets.index(bullet))
 
-    keys = pygame.key.get_pressed()
+        for ene in enemies:
+            if bullet in bullets:  # bullet still exists
+                if bullet.y - bullet.radius < ene.hitbox[1] + ene.hitbox[3] and bullet.y + bullet.radius > ene.hitbox[1]:
+                    if bullet.x + bullet.radius > ene.hitbox[0] and bullet.x - bullet.radius < ene.hitbox[0] + ene.hitbox[2]:
+                        ene.hit(bullet.dmg)
+                        hitSound.play()
+                        hitMarks.append(marker(bullet.x, bullet.y, str(bullet.dmg)))
+                        score += 1
+                        bullets.pop(bullets.index(bullet))
+                        if not ene.visible:
+                            enemies.pop(enemies.index(ene))
 
+
+
+    keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE] and shootLoop == 0:
         if player1.left:
             facing = -1
