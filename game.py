@@ -37,7 +37,7 @@ class enemy(object):
                 pygame.image.load('pics/L7E.png'), pygame.image.load('pics/L8E.png'), pygame.image.load('pics/L9E.png'),
                 pygame.image.load('pics/L10E.png'), pygame.image.load('pics/L11E.png')]
 
-    def __init__(self, x, y, width, height, end, name):
+    def __init__(self, x, y, width, height, end, name, hp):
         self.x = x
         self.y = y
         self.width = width
@@ -49,8 +49,8 @@ class enemy(object):
         self.hitbox = (self.x + 17, self.y + 2, 31, 57)
         self.hitCount = 0
         self.name = name
-        self.maxHealth = 20
-        self.health = 20
+        self.maxHealth = hp
+        self.health = hp
         self.visible = True
 
     def draw(self, win):
@@ -199,8 +199,8 @@ def redrawGameWindow():
 
 # main
 player1 = player(90, 350, 64, 64)
-goblin = enemy(550, 350, 64, 64, 150, "goblin")
-enemies = [goblin]
+# goblin = enemy(550, 350, 64, 64, 150, "goblin")
+enemies = []
 bullets = []
 hitMarks = []
 shootLoop = 0
@@ -213,8 +213,15 @@ while run:
     # max 27 FPS
     clock.tick(27)
 
-    if random.randint(0, 100) == 100:
-        enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "goblin" + str(i)))
+    randInt_0_1000 = random.randint(0, 1000)
+    if randInt_0_1000 < 10:  # standard goblin 1%
+        enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "goblin" + str(i), 20))
+        i += 1
+    elif randInt_0_1000 < 12:  # BIG goblin 0.2%
+        enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "BIG-goblin" + str(i), 40))
+        i += 1
+    elif randInt_0_1000 < 14:  # tiny goblin 0.2%
+        enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "tiny-goblin" + str(i), 10))
         i += 1
 
     # shoot cooldown
@@ -260,7 +267,7 @@ while run:
         else:
             facing = 1
         if len(bullets) < 5:
-            bullets.append(projectile(round(player1.x + player1.width//2), round(player1.y + player1.height//2), 6, (0,0,0), facing, random.randint(0,2)))
+            bullets.append(projectile(round(player1.x + player1.width//2), round(player1.y + player1.height//2), 6, (0,0,0), facing, random.randint(1,5)))
             bulletSound.play()
 
         shootLoop = 1
