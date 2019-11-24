@@ -139,8 +139,8 @@ class player(object):
         window.blit(text, (screenWidth/2 - text.get_width()/2, screenHeight/2))
         pygame.display.update()
         i = 0
-        while i < 300:
-            pygame.time.delay(10)
+        while i < 100:  # this type of delay allows the user to exit the game during the delay
+            pygame.time.delay(10)  # this delay makes the game unresponsive for the time
             i += 1
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -227,10 +227,11 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-    if player1.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > goblin.hitbox[1]:
-        if player1.hitbox[0] + player1.hitbox[2] > goblin.hitbox[0] and player1.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
-            player1.hit()
-            score -= 5
+    for ene in enemies:
+        if player1.hitbox[1] < ene.hitbox[1] + ene.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > ene.hitbox[1]:
+            if player1.hitbox[0] + player1.hitbox[2] > ene.hitbox[0] and player1.hitbox[0] < ene.hitbox[0] + ene.hitbox[2]:
+                player1.hit()
+                score -= 5
 
     for bullet in bullets:
         if screenWidth > bullet.x > 0:
