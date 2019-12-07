@@ -16,3 +16,6 @@ requirements are installed:
 
 pip install -r requirements.txt
 
+# how to play
+Move - arrowkeys
+Shoot - spacebar

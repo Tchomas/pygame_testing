@@ -21,11 +21,11 @@ hitSound = pygame.mixer.Sound('sounds/hit.wav')
 bulletSound.set_volume(0.2)
 hitSound.set_volume(0.2)
 music = pygame.mixer.music.load('sounds/music.mp3')
-pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.05)
+#pygame.mixer.music.play(-1)
 
 score = 0
-
+GameLevel = 1
 
 class enemy(object):
     walkRight = [pygame.image.load('pics/R1E.png'), pygame.image.load('pics/R2E.png'), pygame.image.load('pics/R3E.png'),
@@ -108,6 +108,7 @@ class player(object):
         self.jumpCount = 10
         self.standing = True
         self.hitbox = (self.x + 20, self.y, 29, 60)
+        self.lvl = 1
 
     def draw(self, win):
         if self.walkCount + 1 >= 27:
@@ -195,6 +196,15 @@ def redrawGameWindow():
     fps = font1.render('FPS: ' + str(round(clock.get_fps())), 1, (0, 0, 0))
     window.blit(fps, (10, 10))
 
+    game_time = font1.render('Time: ' + str(pygame.time.get_ticks()//1000), 1, (0, 0, 0))
+    window.blit(game_time, (120, 10))
+
+    playerlvl = font1.render('Player lvl: ' + str(player1.lvl), 1, (0, 0, 0))
+    window.blit(playerlvl, (10, 40))
+
+    gamelvl = font1.render('Game lvl : ' + str(GameLevel), 1, (0, 0, 0))
+    window.blit(gamelvl, (10, 60))
+
     pygame.display.update()
 
 # main
@@ -258,8 +268,6 @@ while run:
                         if not ene.visible:
                             enemies.pop(enemies.index(ene))
 
-
-
     keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE] and shootLoop == 0:
         if player1.left:
@@ -286,7 +294,7 @@ while run:
         player1.standing = True
         player1.walkCount = 0
 
-    if not(player1.isJump):
+    if not player1.isJump:
         if keys[pygame.K_UP]:
             player1.isJump = True
 
