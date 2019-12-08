@@ -7,14 +7,16 @@ https://www.youtube.com/channel/UC4JX40jDee_tINbkjycV4Sg/featured
 
 https://techwithtim.net/tutorials/game-development-with-python/pygame-tutorial/
 
-# requirements.txt
-requirements are generated with command:
+# requirements
+Python 3
 
-pip freeze > requirements.txt
-
-requirements are installed:
+pygame can be installed with:
 
 pip install -r requirements.txt
+
+requirements were generated with command:
+
+pip freeze > requirements.txt
 
 # how to play
 Move - arrowkeys
