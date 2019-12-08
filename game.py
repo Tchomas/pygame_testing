@@ -27,6 +27,7 @@ pygame.mixer.music.set_volume(0.05)
 score = 0
 GameLevel = 1
 
+
 class enemy(object):
     walkRight = [pygame.image.load('pics/R1E.png'), pygame.image.load('pics/R2E.png'), pygame.image.load('pics/R3E.png'),
                  pygame.image.load('pics/R4E.png'), pygame.image.load('pics/R5E.png'), pygame.image.load('pics/R6E.png'),
@@ -109,6 +110,7 @@ class player(object):
         self.standing = True
         self.hitbox = (self.x + 20, self.y, 29, 60)
         self.lvl = 1
+        self.kills = 0
 
     def draw(self, win):
         if self.walkCount + 1 >= 27:
@@ -163,7 +165,7 @@ class marker(object):
 
 
 class projectile(object):
-    def __init__(self,x,y,radius,color,facing,dmg):
+    def __init__(self,x,y,radius,color,facing,dmg,player):
         self.x = x
         self.y = y
         self.radius = radius
@@ -171,6 +173,7 @@ class projectile(object):
         self.facing = facing
         self.vel = 12 * facing
         self.dmg = dmg
+        self.owner = player
 
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
@@ -193,19 +196,14 @@ def redrawGameWindow():
         if hitMark.time < pygame.time.get_ticks() - 800:
             hitMarks.pop(hitMarks.index(hitMark))
 
-    fps = font1.render('FPS: ' + str(round(clock.get_fps())), 1, (0, 0, 0))
-    window.blit(fps, (10, 10))
-
-    game_time = font1.render('Time: ' + str(pygame.time.get_ticks()//1000), 1, (0, 0, 0))
-    window.blit(game_time, (120, 10))
-
-    playerlvl = font1.render('Player lvl: ' + str(player1.lvl), 1, (0, 0, 0))
-    window.blit(playerlvl, (10, 40))
-
-    gamelvl = font1.render('Game lvl : ' + str(GameLevel), 1, (0, 0, 0))
-    window.blit(gamelvl, (10, 60))
+    window.blit(font1.render('FPS: ' + str(round(clock.get_fps())), 1, (0, 0, 0)), (10, 10))
+    window.blit(font1.render('Time: ' + str(pygame.time.get_ticks()//1000), 1, (0, 0, 0)), (120, 10))
+    window.blit(font1.render('Player lvl: ' + str(round(player1.lvl)), 1, (0, 0, 0)), (10, 40))
+    window.blit(font1.render('Kills : ' + str(player1.kills), 1, (0, 0, 0)), (10, 60))
+    window.blit(font1.render('Game lvl : ' + str(GameLevel), 1, (0, 0, 0)), (10, 80))
 
     pygame.display.update()
+
 
 # main
 player1 = player(90, 350, 64, 64)
@@ -257,7 +255,7 @@ while run:
             bullets.pop(bullets.index(bullet))
 
         for ene in enemies:
-            if bullet in bullets:  # bullet still exists
+            if bullet in bullets:  # bullet still exists in list
                 if bullet.y - bullet.radius < ene.hitbox[1] + ene.hitbox[3] and bullet.y + bullet.radius > ene.hitbox[1]:
                     if bullet.x + bullet.radius > ene.hitbox[0] and bullet.x - bullet.radius < ene.hitbox[0] + ene.hitbox[2]:
                         ene.hit(bullet.dmg)
@@ -267,6 +265,8 @@ while run:
                         bullets.pop(bullets.index(bullet))
                         if not ene.visible:
                             enemies.pop(enemies.index(ene))
+                            bullet.owner.kills += 1
+                            bullet.owner.lvl += 0.2
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE] and shootLoop == 0:
@@ -275,7 +275,8 @@ while run:
         else:
             facing = 1
         if len(bullets) < 5:
-            bullets.append(projectile(round(player1.x + player1.width//2), round(player1.y + player1.height//2), 6, (0,0,0), facing, random.randint(1,5)))
+            bullets.append(projectile(round(player1.x + player1.width//2), round(player1.y + player1.height//2), round(player1.lvl),
+                                      (0,0,0), facing, random.randint(0 + round(player1.lvl), 3 + round(player1.lvl)), player1))
             bulletSound.play()
 
         shootLoop = 1
