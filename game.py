@@ -101,7 +101,7 @@ class player(object):
         self.y = y
         self.width = width
         self.height = height
-        self.velocity = 16
+        self.velocity = 12
         self.isJump = False
         self.left = True
         self.right = False
@@ -220,16 +220,17 @@ run = True
 while run:
     # max 27 FPS
     clock.tick(27)
+    GameLevel = 1 + pygame.time.get_ticks()//5000  # increase game level every 5s
 
     randInt_0_1000 = random.randint(0, 1000)
-    if randInt_0_1000 < 10:  # standard goblin 1%
+    if GameLevel < 20 and randInt_0_1000 < 25:
+        enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "tiny-goblin" + str(i), 10))
+        i += 1
+    elif GameLevel > 10 and randInt_0_1000 < 40:
         enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "goblin" + str(i), 20))
         i += 1
-    elif randInt_0_1000 < 12:  # BIG goblin 0.2%
-        enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "BIG-goblin" + str(i), 40))
-        i += 1
-    elif randInt_0_1000 < 14:  # tiny goblin 0.2%
-        enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "tiny-goblin" + str(i), 10))
+    elif GameLevel > 15 and randInt_0_1000 < 70:
+        enemies.append(enemy(screenWidth - 100, 350, 64, 64, 150, "BIG-goblin" + str(i), 40 + GameLevel))
         i += 1
 
     # shoot cooldown
